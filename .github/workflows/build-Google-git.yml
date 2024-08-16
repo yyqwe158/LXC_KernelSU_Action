@@ -1,4 +1,4 @@
-name: Build kernel use Google-git
+name: Build Google-git
 on:
   watch:
     types: [started]
