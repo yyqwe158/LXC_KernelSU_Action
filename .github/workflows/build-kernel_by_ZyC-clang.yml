@@ -214,7 +214,7 @@ jobs:
         if [ ${{ env.ENABLE_CCACHE }} = true ]; then
             make -j$(nproc --all) CC="ccache clang" O=out ARCH=${{ env.ARCH }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
         else
-            make -j$(nproc --all) KCFLAGS+=-Wno-error CC=clang O=out ARCH=${{ env.ARCH }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
+            make -j$(nproc --all) CC=clang O=out ARCH=${{ env.ARCH }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-gnu- CROSS_COMPILE_ARM32=arm-linux-gnueabi- ${{ env.CUSTOM_CMDS }} ${{ env.EXTRA_CMDS }} 
         fi
 
     - name: Check a kernel output files
