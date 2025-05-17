@@ -100,6 +100,14 @@ jobs:
              wget -O clang16.tar.gz https://github.com/ZyCromerZ/Clang/releases/download/16.0.0-20230326-release/Clang-16.0.0-20230326.tar.gz
              tar -C zyc-clang/ -xf clang16.tar.gz
         fi
+        if [ ${{ env.ZYC_CLANG_VERSION }} = 20 ]; then                       
+              wget -O clang20.tar.gz https://github.com/ZyCromerZ/Clang/releases/download/20.0.0git-20250129-release/Clang-20.0.0git-20250129.tar.gz
+              tar -C zyc-clang/ -xf clang20.tar.gz
+        fi
+        if [ ${{ env.ZYC_CLANG_VERSION }} = 21 ]; then                       
+             wget -O clang21.tar.gz https://github.com/ZyCromerZ/Clang/releases/download/21.0.0git-20250517-release/Clang-21.0.0git-20250517.tar.gz
+             tar -C zyc-clang/ -xf clang21.tar.gz
+        fi
 
     - name: Download mkbootimg tools
       if: env.BUILD_BOOT_IMG == 'true'
