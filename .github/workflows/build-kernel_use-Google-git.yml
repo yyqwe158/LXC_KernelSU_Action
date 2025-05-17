@@ -67,27 +67,22 @@ jobs:
         sudo apt-get update
         #sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3
         sudo apt install -y curl llvm lld wget vim git ccache automake flex lzop bison gperf build-essential zip zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler kmod python3 python3-pip
+        sudo apt install --no-install-recommends -y bc binutils binutils-aarch64-linux-gnu binutils-arm-linux-gnueabi bison flex g++ gcc libssl-dev make patch subversion gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi ca-certificates curl git tar unzip wget zip zstd
         mkdir -p $GITHUB_WORKSPACE/kernel_workspace
 
     - name: Download Clang-aosp
-      if: env.USE_CUSTOM_CLANG != 'true'
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
-        git clone -q --depth=1 --single-branch https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 -b ${{ env.CLANG_BRANCH }} clang-aosp
-        
-
-    - name: Download Google_gcc-4.9 
-      run: |
-        cd $GITHUB_WORKSPACE/kernel_workspace
-        cd $GITHUB_WORKSPACE/kernel_workspace
-        mkdir google_gcc-4.9
-        cd ./google_gcc-4.9
-        wget https://gitlab.com/tomxi1997/google_gcc-4.9/-/raw/main/arm-linux-androideabi-4.9.tar.xz
-        tar -xf arm-linux-androideabi-4.9.tar.xz
-        wget https://gitlab.com/tomxi1997/google_gcc-4.9/-/raw/main/aarch64-linux-android-4.9.tar.xz
-        tar -xf aarch64-linux-android-4.9.tar.xz
-        rm *.xz
-
+        URL="https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/master/README.md"
+        # Download the README file
+        README=$(curl -s $URL)
+        # Extract the version number
+        VERSION=$(echo "$README" | grep 'clang-r' | head -1 | grep -oE 'clang-r[0-9]+' | head -1)
+        wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/$VERSION.tar.gz -O google-clang.tar.gz
+        mkdir google-clang && tar -xzvf google-clang.tar.gz -C google-clang > /dev/null
+        export CLANG1_PATH=$GITHUB_WORKSPACE/kernel_workspace/google-clang/bin
+        export PATH=${CLANG1_PATH}:${PATH}
+        export LD_LIBRARY_PATH="$GITHUB_WORKSPACE/kernel_workspace/google-clang/bin/../lib:$PATH"
          
     - name: Download mkbootimg tools
       if: env.BUILD_BOOT_IMG == 'true'
@@ -182,7 +177,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
         #export PATH=$GITHUB_WORKSPACE/kernel_workspace/clang-aosp/bin:$PATH
-        export PATH=$GITHUB_WORKSPACE/kernel_workspace/clang-aosp/clang-${{ env.CLANG_VERSION }}/bin:$GITHUB_WORKSPACE/kernel_workspace/aarch64-linux-android-4.9/bin:$GITHUB_WORKSPACE/kernel_workspace/arm-linux-androideabi-4.9/bin:$PATH
+        #export PATH=$GITHUB_WORKSPACE/kernel_workspace/clang-aosp/clang-${{ env.CLANG_VERSION }}/bin:$GITHUB_WORKSPACE/kernel_workspace/aarch64-linux-android-4.9/bin:$GITHUB_WORKSPACE/kernel_workspace/arm-linux-androideabi-4.9/bin:$PATH
         export KBUILD_BUILD_HOST=Github-Action
         export KBUILD_BUILD_USER=$(echo ${{ github.actor }} | tr A-Z a-z)
         if [ ! -z ${{ env.KSU_EXPECTED_SIZE }} ] && [ ! -z ${{ env.KSU_EXPECTED_HASH }} ]; then
